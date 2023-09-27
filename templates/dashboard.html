@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %} Member Profile | FRSTP {% endblock %}
+
+{% block content %}
+    <div class="card-wrapper">
+        <!--div class="card">
+            <h1 class="center">目錄</h1>
+            <p class="center">you are currently logged in!</p>
+
+            <div class="center">
+                <a href="/user/signout" class="btn btn--secondary">Sign out</a>
+            </div>
+
+            <div class="center">
+                <a href="/user/update_user" class="btn btn--secondary">Update Information</a>
+            </div>
+
+        </div-->
+        <div class="card shadow mx-auto">
+            <h2 class="card-title text-center mt-3"> Member Profile </h2>
+            <!--h2 class="center">會員資料</h2-->
+
+            <p class="py-3">
+                <strong>NAME: </strong> <span id="user-name"></span><br>
+                <strong>EMAIL: </strong> <span id="user-email"></span><br>
+                <strong>PHONE: </strong> <span id="user-phone"></span><br>
+                <strong>ADDRESS:  </strong> <span id="user-address"></span><br>
+                <strong>GENDER:  </strong> <span id="user-gender"></span><br>
+                <strong>BIRTHDAY:  </strong> <span id="user-birthday"></span><br>
+            </p>
+
+            <div class="text-center">
+                <a class="btn btn-success shadow-lg" href="/user/update_user" role="button"> Edit Profile </a>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        // 解析JSON數據並顯示在網頁上
+        var userInfoStr = '{{ session["user"] | safe }}'; // 使用 safe 過濾器以避免意外的 JavaScript 轉義
+        var userInfo = JSON.parse(userInfoStr);
+
+        // 在HTML中顯示JSON數據
+        document.getElementById("user-name").innerText = userInfo.name;
+        document.getElementById("user-email").innerText = userInfo.email;
+        document.getElementById("user-phone").innerText = userInfo.phone;
+        document.getElementById("user-address").innerText = userInfo.address;
+        document.getElementById("user-gender").innerText = userInfo.gender;
+        document.getElementById("user-birthday").innerText = userInfo.birthday;
+    </script>
+{% endblock %}

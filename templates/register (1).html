@@ -1,0 +1,43 @@
+{% extends "newbase.html" %}
+
+{% block content %}
+<form name="signup_form" action="/user/signup" method="post"></form>
+<div class="card-wrapper">
+  <div class="text-section">
+    <p>這裡是您想要放在左側的文字。</p>
+    <!-- 您可以加入其他元素或文字 -->
+  </div>
+
+  <div class="card">
+    <h1 class="center">建立新帳號</h1>
+    <form name="signup_form">
+      <label for="name">Name</label>
+      <input type="text" name="name" class="field" required>
+      <label for="email">Email</label>
+      <input type="email" name="email" class="field" required>
+      <label for="password">Password</label>
+      <input type="password" name="password" class="field" required>
+      <label for="phone">Phone</label>
+      <input type="text" name="phone" class="field" required>
+      <label for="address">Address</label>
+      <input type="text" name="address" class="field" required>
+      <label for="gender">Gender</label>
+      <select id="gender" name="gender">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+      <label for="birthday">Birthday</label>
+      <input type="date" id="birthday" name="birthday">
+
+      <p class="error error--hidden"></p>
+
+      <input type="submit" value="Sign up" class="btn">
+      <a href="/user/login" class="forgot-password">
+        <center>已有帳號，前往登錄</center>
+      </a>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

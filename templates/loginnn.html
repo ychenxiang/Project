@@ -1,0 +1,33 @@
+{% extends "newbase.html" %}
+
+{% block content %}
+
+<div class="card-wrapper">
+    <div class="text-section">
+        <p>這裡是您想要放在左側的文字。</p>
+        <!-- 您可以加入其他元素或文字 -->
+    </div>
+
+    <div class="card">
+        <h1 class="center">登入</h1>
+        <form name="login_form">
+            <label for="email">Email</label>
+            <input type="email" name="email" class="field" required>
+            <label for="password">Password</label>
+            <input type="password" name="password" class="field" required>
+
+            <p class="error error--hidden"></p>
+
+            <input type="submit" value="Log in" class="btn">
+            <a href="#" class="forgot-password">
+                <center>忘記密碼?</center>
+            </a> 
+            <br><hr class="custom-line"></br>
+            
+        </form>
+        <center><a href="/user/register" class="btnn">Create an account</a></center>
+    </div>
+    
+</div>
+
+{% endblock %}

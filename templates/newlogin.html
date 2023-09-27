@@ -1,0 +1,63 @@
+{% extends "newbase.html" %}
+
+{% block title %} New Login {% endblock%}
+
+{% block background %}
+
+body {
+    background-image: url('static/image/test_background.jpg');
+    
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="card-wrapper pt-5 pb-5">
+
+    <div class="text-section" align="center">
+        <h2> Welcome to our FRSTP </h2>
+    </div>
+
+    <div class="card p-3" style="background-color: moccasin;">
+        <h3 class="card-title" align="center"> Login </h3>
+        <div class="container">
+
+            <!--title-->
+            <div class="title pt-0">
+                <h2 align="center">
+                    Let's Start! (New Login)
+                </h2>
+            </div>
+
+            <form name="login_form">
+
+                <!--Email-->
+                <div class="form-floating form-group">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="example@example.com">
+                    <label for="email"> Email </label>
+                </div>
+
+                <!--Password-->
+                <div class="form-floating form-group">
+                    <input type="password" class="form-control" id="password1" name="password1" placeholder="password1">
+                    <label for="password1"> Password </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3 me-2"> Confirm </button>
+                <button type="reset" class="btn btn-secondary mt-3"> Clear All </button>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<!--br><br><br><br><br><br><br><br-->
+
+{% endblock %}

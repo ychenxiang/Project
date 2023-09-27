@@ -1,0 +1,49 @@
+{% extends "newbase.html" %}
+
+{% block content %}
+<style>
+    .container {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+    }
+
+    .card {
+        width: 300px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .button-container {
+        margin-top: 16px;
+        text-align: center;
+    }
+
+    button {
+        margin: 8px;
+    }
+</style>
+<div class="container">
+    <!-- Left Card -->
+    <div class="card">
+        <h2>這是您剛剛拍的照片</h2>
+        <p>hello</p>
+    </div>
+
+    <!-- Right Card -->
+    <div class="card">
+        <h2>這是您之前拍的照片</h2>
+        <p>hello</p>
+    </div>
+</div>
+
+<!-- Buttons below cards -->
+<div class="button-container">
+    <button>再拍一張</button>
+    <button>儲存</button>
+</div>
+
+{% endblock %}
