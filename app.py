@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, session, redirect, Response
+from flask import Flask, render_template, url_for, request, session, redirect, Response, flash
 import json
 import pymongo
 from functools import wraps
@@ -10,14 +10,23 @@ import os, sys
 import numpy as np
 import time
 from webcam2 import FaceRecognition
+from membercam import FaceRecognition_member
+import tkinter as tk
+
+
 
 app = Flask(__name__)
 app.secret_key = b'kushfuii7w4y7ry47ihwiheihf8774sdf4'
+
 
 video_stream = VideoCamera()
 
 # 全局变量用于存储已拍摄的照片
 captured_photo = None
+
+global_name = None
+
+
 
 def login_required(f):
     @wraps(f)
@@ -46,7 +55,15 @@ from user import routes
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    user_json = session.get('user')
+    if user_json:
+        user = json.loads(user_json)
+        user_data = json.loads(user_json)
+        user_email = user_data['email']
+        return render_template('home.html', user_email=user_email)
+    else:
+        return render_template('home.html')
+
 
 
 @app.route('/user/register')
@@ -92,14 +109,14 @@ def take_photo():
     frame = video_stream.get_frame()
 
     if frame:
-            # 使用 OpenCV 解码 JPEG 图像为 NumPy 数组
+        # 使用 OpenCV 解码 JPEG 图像为 NumPy 数组
         nparr = np.frombuffer(frame, np.uint8)
         image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-            # 使用当前时间戳作为文件名
+        # 使用当前时间戳作为文件名
         timestamp = int(time.time())
 
-            # 将照片数据存储在 captured_photo 中
+        # 将照片数据存储在 captured_photo 中
         captured_photo = cv2.imencode('.jpg', image)[1].tobytes()
 
     return render_template('cam.html', taken_photo=captured_photo)
@@ -113,6 +130,12 @@ def save_photo():
         user_json = session.get('user')  # Get user JSON from session
         user_data = json.loads(user_json)  # Parse JSON to dictionary
         user_name = user_data['name']
+
+        #try:
+            #photo_id = fs.put(captured_photo, filename=f"{user_name}.jpg")
+            #print(f"Photo saved with ID: {photo_id}")
+        #except Exception as e:
+            #print(f"Error saving photo: {str(e)}")
 
         # 指定保存到 "faces" 子文件夹的路径
         output_folder = 'faces'
@@ -136,7 +159,7 @@ def retake_photo():
     return render_template('cam.html', taken_photo=captured_photo)
 
 
-#人臉辨識
+#人臉辨識(入場辨識)
 @app.route('/cam2')
 def cam2():
     return render_template('cam2.html')
@@ -162,9 +185,102 @@ def generate_frames():
 
     video_capture.release()
 
+
+# 人臉辨識(驗證使用者)
+@app.route('/cam3')
+def cam3():
+    return render_template('cam3.html')
+
+
+# 人臉辨識(驗證使用者)
+@app.route('/set_name')
+def set_name():
+    # 將名字設定為 session 的值
+    # name = session.get('name')
+    user_json = session.get('user')  # Get user JSON from session
+    user_data = json.loads(user_json)  # Parse JSON to dictionary
+    name = user_data['name']
+    print("這裡是setname")
+
+    # 同時也設定全域變數 global_name
+    global global_name
+    global_name = name
+
+    return 'Name set successfully'
+
+'''
+@app.route('/membercam')
+def membercam():
+    user_json = session.get('user')  # Get user JSON from session
+    user_data = json.loads(user_json)  # Parse JSON to dictionary
+    name = user_data['name']
+    print("這裡是setname")
+
+    # 同時也設定全域變數 global_name
+    global global_name
+    global_name = name
+
+    return render_template('membercam.html')
+'''
+
 @app.route('/video_feed2')
 def video_feed2():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+'''
+@app.route('/recognition_correct')
+def recognition_correct():
+    generated_url = url_for('home')
+    return render_template('recognition_correct.html', home_url=generated_url)
+
+@app.route('/recognition_fail')
+def recognition_fail():
+    generated_url = url_for('home')
+    return render_template('recognition_fail.html',  home_url=generated_url)
+'''
+
+@app.route('/memberprofile')
+@login_required
+def memberprofile():
+    user_json = session.get('user')
+    if user_json:
+        user = json.loads(user_json)
+        user_data = json.loads(user_json)
+        user_email = user_data['email']
+        return render_template('memberprofile.html', user_email=user_email)
+    else:
+        print("user_json is NOT a thing")
+        return redirect('/user/login')
+
+
+@app.route('/user/showphoto')
+@login_required
+def showphoto():
+    return render_template('showphoto.html')
+
+
+@app.route('/admin')
+@login_required
+def admin():
+    print("this is the app.py, going to admin.html")
+    return render_template('admin.html')
+
+
+@app.route('/test')
+def test_admin():
+    print("reaching for test.html")
+    return render_template('test.html', members=members)
+    return render_template('test.html')
+
+
+@app.route('/test_error')
+def test_admin_error():
+    return render_template('test_error.html')
+
+@app.route("/add_event")
+def admin_add_event():
+    return render_template('add_event.html')
+
 
 
 if __name__ == "__main__":
