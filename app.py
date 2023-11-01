@@ -12,11 +12,15 @@ import time
 from webcam2 import FaceRecognition
 from membercam import FaceRecognition_member
 import tkinter as tk
+from datetime import datetime
 
 
 
 app = Flask(__name__)
 app.secret_key = b'kushfuii7w4y7ry47ihwiheihf8774sdf4'
+
+myclient = pymongo.MongoClient("mongodb+srv://team17:TqZI3KaT56q6xwYZ@team17.ufycbtt.mongodb.net/")
+mydb = myclient.test
 
 
 video_stream = VideoCamera()
@@ -26,7 +30,7 @@ captured_photo = None
 
 global_name = None
 
-
+current_datetime = datetime.now()
 
 def login_required(f):
     @wraps(f)
@@ -60,7 +64,14 @@ def home():
         user = json.loads(user_json)
         user_data = json.loads(user_json)
         user_email = user_data['email']
-        return render_template('home.html', user_email=user_email)
+
+        recent_event = list(mydb.events.find({'time': {'$gte': current_datetime}}, {'_id': 1, 'title': 1}).sort("time", 1).limit(6))
+        recent_sale = list(mydb.events.find({'time': {'$gte': current_datetime}}, {'_id': 1, 'title': 1}).sort("ticket_time", 1).limit(6))
+
+        return render_template('home.html',
+                               user_email=user_email,
+                               recent_event=recent_event,
+                               recent_sale=recent_sale)
     else:
         return render_template('home.html')
 
