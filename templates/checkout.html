@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %} 結帳 {% endblock %}
+
+{% block content %}
+    <style>
+
+
+    .ticketTable {
+        border-collapse: collapse;
+        width: 100%;
+        height: 200px;
+        font-size: 0.9em;
+        font-family: sans-serif;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        margin-bottom: 1px; /* 調整下邊距 */
+    }
+
+    .ticketTable th, .ticketTable td {
+        padding: 10px;
+        text-align: left;
+    }
+
+    .ticketTable-tbody tr {
+        margin-bottom: 10px; /* 減小行之間的下邊距 */
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .mt-3 {
+        margin-top: 15px; /* 調整上邊距 */
+    }
+
+    .mb-0 {
+        margin-bottom: 0;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+    }
+
+    .btn-delete {
+        display: inline-block; /* 將按鈕設為行內塊 */
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px; /* 設置內邊距 */
+        text-align: center; /* 文字居中 */
+        text-decoration: none; /* 移除預設文字底線 */
+    }
+
+    .btn-delete:hover {
+        background-color: #bd2130;
+    }
+    </style>
+
+
+
+    <div class="container">
+        <div class="col-md-12 col-sm-12 col-12 mt-3">
+            <div id="countdown" style="font-size: 20px; color: red; text-align: center"></div>
+
+
+            <p>參與者資料</p>
+                <strong>姓名: </strong> {{ name }} <br>
+                <strong>EMAIL: </strong> {{ email }} <br>
+                <strong>電話: </strong> {{ phone }} <br>
+            </div>
+
+            <br>
+            <div class="orderID">訂單編號 1111111</div>
+            <div class="tableBox">
+                <table class="ticketTable">
+                    <thead class="ticketTable-thead">
+                        <tr>
+                            <th>節目</th>
+                            <th>區域</th>
+                            <th>座位</th>
+                            <th>票價(NTD)</th>
+                            <th class="twAct">修改</th>
+                        </tr>
+                    </thead>
+                    <tbody class="ticketTable-tbody">
+                        <tr>
+                            <td>COLDPLAY</td>
+                            <td>A區</td>
+                            <td>1排1號</td>
+                            <td>全票 / 5,800</td>
+                            <td class="initial">
+                                <a class="cancelTicket" href="#" >
+                                    <div class="btn-delete">刪除</div>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #d3d3d3; text-align: right">
+                            <td colspan="4" style="text-align: left">訂購張數</td>
+                            <td style="text-align: right">1 張</td>
+                        </tr>
+                        <tr style="background-color: #d3d3d3; text-align: right">
+                            <td colspan="4" style="text-align: left">總計(NTD)</td>
+                            <td style="text-align: right">5,800</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+            <div class="text-center mt-3 mb-0">
+                <button onclick="cancelOrder()">取消訂單</button>
+                <button onclick="proceedToCheckout()">下一步</button>
+            </div>
+    </div>
+
+
+    <script>
+    // 設定倒數計時器，10分鐘
+    var countdownMinutes = 0;
+    var countdownSeconds = 30;
+
+    var countdownDisplay = document.getElementById('countdown');
+
+    function updateCountdown() {
+        countdownDisplay.textContent = '剩餘時間: ' + countdownMinutes + '分' + countdownSeconds + '秒';
+
+        // 如果倒數計時結束，取消訂單
+        if (countdownMinutes === 0 && countdownSeconds === 0) {
+            cancelOrder();
+        } else {
+            // 更新倒數計時
+            if (countdownSeconds === 0) {
+                countdownMinutes--;
+                countdownSeconds = 59;
+            } else {
+                countdownSeconds--;
+            }
+            setTimeout(updateCountdown, 1000);
+        }
+    }
+
+    // 啟動倒數計時
+    updateCountdown();
+
+    function cancelOrder() {
+        alert('訂單已取消');
+        // 可以添加取消訂單的相關邏輯
+    }
+
+    function proceedToCheckout() {
+        alert('前往結帳');
+        // 可以添加前往結帳的相關邏輯
+    }
+</script>
+
+{% endblock %}
