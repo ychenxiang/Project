@@ -65,15 +65,24 @@ def home():
         user_data = json.loads(user_json)
         user_email = user_data['email']
 
-        recent_event = list(mydb.events.find({'time': {'$gte': current_datetime}}, {'_id': 1, 'title': 1}).sort("time", 1).limit(6))
-        recent_sale = list(mydb.events.find({'time': {'$gte': current_datetime}}, {'_id': 1, 'title': 1}).sort("ticket_time", 1).limit(6))
+        recent_event = list(mydb.events.find({'time': {'$gte': current_datetime}}, {'_id': 1, 'title': 1, 'time': 1}).sort("time", 1).limit(6))
+        recent_sale = list(mydb.events.find({'time': {'$gte': current_datetime}}, {'_id': 1, 'title': 1, 'ticket_time': 1}).sort("ticket_time", 1).limit(6))
 
         return render_template('home.html',
                                user_email=user_email,
                                recent_event=recent_event,
                                recent_sale=recent_sale)
     else:
-        return render_template('home.html')
+        recent_event = list(
+            mydb.events.find({'time': {'$gte': current_datetime}}, {'_id': 1, 'title': 1, 'time': 1}).sort("time",
+                                                                                                           1).limit(6))
+        recent_sale = list(
+            mydb.events.find({'time': {'$gte': current_datetime}}, {'_id': 1, 'title': 1, 'ticket_time': 1}).sort(
+                "ticket_time", 1).limit(6))
+
+        return render_template('home.html',
+                               recent_event=recent_event,
+                               recent_sale=recent_sale)
 
 
 
@@ -293,6 +302,15 @@ def admin_add_event():
     return render_template('add_event.html')
 
 
+@app.route("/checkout")
+def checkout():
+    user_json = session.get('user')  # Get user JSON from session
+    user_data = json.loads(user_json)  # Parse JSON to dictionary
+    name = user_data['name']
+    email = user_data['email']
+    phone = user_data['phone']
+
+    return render_template('checkout.html', name = name, email = email, phone =phone)
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', debug=True, port=5000)
