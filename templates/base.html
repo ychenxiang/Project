@@ -11,14 +11,16 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
         <!--link rel="stylesheet" href="static/css/newstyle.css"-->
-        <link rel="stylesheet" href="/static/css/normalize.css">
+        <!--link rel="stylesheet" href="/static/css/normalize.css">
         <!--link rel="stylesheet" href="/static/css/styles.css">
         <link rel="stylesheet" href="/static/css/card.css">
         <link rel="stylesheet" href="/static/css/newstyles.css"-->
-        <link rel="stylesheet" href="/static/css/base.css">
-        <link rel="stylesheet" href="/static/css/login.css">
+        <link rel="stylesheet" href="/static/css/style.css">
         
-        <title> {% block title %} Base | FRSTP {% endblock %}</title>
+        <title> {% block title %} Base {% endblock %} | BioTIX </title>
+        <link rel="shortcut icon" href="\static\icon\BioTIX_icon.png" type="static/icon/BioTIX_icon.png">
+        
+        
     </head>
 
     <body>
@@ -37,18 +39,25 @@
                     <title> Home </title>
                 </a>
 
-                <!--a type="button" href="#home"> FRSTP </a-->
-
+                <!-- Links -->
                 <div class="collapse navbar-collapse bg-faded" id="mynavbar">
                     <ul class="navbar-nav">
                         <li class="nav-item ms-2">
-                            <a class="nav-link" href="#"> Link1 </a>
+                            <a class="nav-link" href="/all_event"> 活動資訊 </a>
                         </li>
                         <li class="nav-item ms-2">
                             <a class="nav-link" href="#"> Link2 </a>
                         </li>
                         <li class="nav-item ms-2">
                             <a class="nav-link" href="#"> Link3 </a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <form method="POST" action="/search" class="form-inline">
+                                <div class="input-group">
+                                    <input type="text" name="keyword" placeholder="搜尋活動" class="form-control">
+                                    <button type="submit" class="btn btn-primary">搜索</button>
+                                </div>
+                            </form>
                         </li>
                     </ul>
                 </div>
@@ -67,11 +76,19 @@
 
                     <ul class="dropdown-menu dropdown-menu-end">
                         {% if session.logged_in %}
-                        <li><p class="dropdown-header"> Member : <span  id="dropdown_user_name"></span></p></li>
-                        <!--li><h6 class="dropdown-header"> MEMBER mode </h6></li-->
+                        <li>
+                            <p class="dropdown-header">
+                                {% if user_email == 'ncumis.team17@gmail.com' %}
+                                Admin : 
+                                {% else %}
+                                Member :
+                                {% endif %}
+                                <span  id="dropdown_user_name"></span>
+                            </p>
+                        </li>
 
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/dashboard"> View profile </a></li>
+                        <li><a class="dropdown-item" href="/memberprofile"> View membership </a></li>
                         <li><a class="dropdown-item" href="/user/update_user"> Edit profile </a></li>
 
                         <li><hr class="dropdown-divider"></li>
@@ -79,10 +96,9 @@
 
                         {% else %}
                         <li><p class="dropdown-header pt-1 pb-1"> Guest </p></li>
-                        <!--li><h6 class="dropdown-header"> GUEST mode </h6></li-->
 
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item disabled" href="/dashboard"> View profile </a></li>
+                        <li><a class="dropdown-item disabled" href="/memberprofile"> View membership </a></li>
                         <li><a class="dropdown-item disabled" href="/user/update_user"> Edit profile </a></li>
 
                         <li><hr class="dropdown-divider"></li>

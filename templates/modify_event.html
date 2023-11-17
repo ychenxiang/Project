@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %} Add event {% endblock %}
+
+{% block content %}
+
+<div class="card shadow mx-auto">
+    <h2 class="card-title text-center mt-3"> Edit Event </h2>
+
+    <form method="POST" name="edit_event_form" enctype="multipart/form-data">
+
+        <!--Title-->
+        <div class="form-floating form-group mt-1">
+            <input type="text" class="form-control" id="title" name="title" placeholder="example_title" value="{{ event.title }}" required>
+            <label for="title"> Title </label>
+        </div>
+
+         <!--Category-->
+        <div class="form-floating form-group mt-3">
+
+            <select class="form-select" aria-label="select category" id="category" name="category">
+                <option value="1" {% if event.category=='1' %} selected {% endif %}> 華語 </option>
+                <option value="2" {% if event.category=='2' %} selected {% endif %}> 韓國 </option>
+                <option value="3" {% if event.category=='3' %} selected {% endif %}> 日本 </option>
+                <option value="4" {% if event.category=='4' %} selected {% endif %}> 西洋 </option>
+            </select>
+            <label for="category"> Category </label>
+        </div>
+
+        <!--Time-->
+        <div class="form-floating form-group mt-3">
+            <input type="datetime-local" class="form-control" id="time" name="time" placeholder="YYYY-MM-DDThh:mm:ssTZD" value="{{ event.time }}" required>
+            <label for="time"> Time </label>
+        </div>
+
+        <!--Ticket Time-->
+        <div class="form-floating form-group mt-3">
+            <input type="datetime-local" class="form-control" id="ticket_time" name="ticket_time" placeholder="YYYY-MM-DDThh:mm:ssTZD" value="{{ event.ticket_time }}" required>
+            <label for="ticket_time"> Ticket time </label>
+        </div>
+
+        <!--Ticket Price-->
+        <div class="form-floating form-group mt-3">
+            <input type="text" class="form-control" id="ticket_price" name="ticket_price" placeholder="123 NTD" value="{{ event.ticket_price }}" required>
+            <label for="ticket_price"> Ticket Price </label>
+        </div>
+
+        <!--Ticket Amount-->
+        <div class="form-floating form-group mt-3">
+            <input type="text" class="form-control" id="ticket_amount" name="ticket_amount" placeholder="123" value="{{ event.ticket_amount }}" required>
+            <label for="ticket_amount"> Ticket Amount </label>
+        </div>
+
+        <!--Description-->
+        <div class="form-floating form-group mt-3">
+            <input type="text" class="form-control" id="description" name="description" placeholder="description" value="{{ event.description }}" required>
+            <label for="description"> Description </label>
+        </div>
+
+        <!--Notices-->
+        <div class="form-floating form-group mt-3">
+            <input type="text" class="form-control" id="notices" name="notices" placeholder="notices" value="{{ event.notices }}" required>
+            <label for="notices"> Notices </label>
+        </div>
+
+        <!--File Upload-->
+        <!--
+        <div class="form-floating form-group mt-3">
+            <input type="file" class="form-control" id="photo" name="photo" accept="image/jpeg" required>
+        </div>
+        -->
+
+        <p class="error error--hidden mt-3 mb-0"></p>
+
+        <div class="text-center mt-3 mb-0">
+            <button type="submit" class="btn btn-primary add-event-confirm shadow"> Edit </button>
+            <button type="reset" class="btn btn-secondary add-event-confirm shadow"> Clear </button>
+        </div>
+
+    </form>
+
+</div>
+
+<br><br><br><br>
+
+{% endblock %}

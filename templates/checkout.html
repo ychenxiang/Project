@@ -73,7 +73,7 @@
             </div>
 
             <br>
-            <div class="orderID">訂單編號 1111111</div>
+            <div class="orderID">訂單編號 {{ order_id }}</div>
             <div class="tableBox">
                 <table class="ticketTable">
                     <thead class="ticketTable-thead">
@@ -111,17 +111,14 @@
         </div>
 
             <div class="text-center mt-3 mb-0">
-                <button onclick="cancelOrder()">取消訂單</button>
                 <button onclick="proceedToCheckout()">下一步</button>
             </div>
     </div>
 
 
     <script>
-    // 設定倒數計時器，10分鐘
-    var countdownMinutes = 0;
-    var countdownSeconds = 30;
-
+    var countdownMinutes;
+    var countdownSeconds;
     var countdownDisplay = document.getElementById('countdown');
 
     function updateCountdown() {
@@ -142,8 +139,24 @@
         }
     }
 
-    // 啟動倒數計時
-    updateCountdown();
+    function startCountdown() {
+        // 檢查localStorage中是否有保存的時間
+        var storedMinutes = localStorage.getItem('countdownMinutes');
+        var storedSeconds = localStorage.getItem('countdownSeconds');
+
+        // 如果有保存的時間，使用它們
+        if (storedMinutes !== null && storedSeconds !== null) {
+            countdownMinutes = parseInt(storedMinutes, 10);
+            countdownSeconds = parseInt(storedSeconds, 10);
+        } else {
+            // 否則，設定初始時間，這裡設定為10分鐘
+            countdownMinutes = 0;
+            countdownSeconds = 30;
+        }
+
+        // 啟動倒數計時
+        updateCountdown();
+    }
 
     function cancelOrder() {
         alert('訂單已取消');
@@ -154,6 +167,17 @@
         alert('前往結帳');
         // 可以添加前往結帳的相關邏輯
     }
+
+    // 在頁面載入時啟動計時器
+    window.onload = startCountdown;
+
+    // 在頁面離開前將計時器狀態保存到localStorage中
+    window.onbeforeunload = function () {
+        localStorage.setItem('countdownMinutes', countdownMinutes);
+        localStorage.setItem('countdownSeconds', countdownSeconds);
+    };
+
+
 </script>
 
 {% endblock %}

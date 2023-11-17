@@ -1,27 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %} Member Profile | FRSTP {% endblock %}
+{% block title %} Member Profile {% endblock %}
 
 {% block content %}
     <div class="card-wrapper">
-        <!--div class="card">
-            <h1 class="center">目錄</h1>
-            <p class="center">you are currently logged in!</p>
-
-            <div class="center">
-                <a href="/user/signout" class="btn btn--secondary">Sign out</a>
-            </div>
-
-            <div class="center">
-                <a href="/user/update_user" class="btn btn--secondary">Update Information</a>
-            </div>
-
-        </div-->
         <div class="card shadow mx-auto">
             <h2 class="card-title text-center mt-3"> Member Profile </h2>
-            <!--h2 class="center">會員資料</h2-->
 
-            <p class="py-3">
+            <p class="user-profile py-6 ms-10">
                 <strong>NAME: </strong> <span id="user-name"></span><br>
                 <strong>EMAIL: </strong> <span id="user-email"></span><br>
                 <strong>PHONE: </strong> <span id="user-phone"></span><br>
@@ -32,7 +18,16 @@
 
             <div class="text-center">
                 <a class="btn btn-success shadow-lg" href="/user/update_user" role="button"> Edit Profile </a>
+                {% if user_email == 'ncumis.team17@gmail.com' %}
+                <a class="btn btn-danger shadow-lg" href="/admin" role="button"> Admin mode </a>
+                <a hidden class="btn btn-success shadow-lg" href="/cam" role="button"> Take Photo </a>
+                {% else %}
+                <a hidden class="btn btn-danger shadow-lg" href="/admin" role="button"> Admin mode </a>
                 <a class="btn btn-success shadow-lg" href="/cam" role="button"> Take Photo </a>
+                {% endif %}
+                <!--
+                <a class="btn btn-danger shadow-lg" href="/admin" role="button"> test admin </a>
+                -->
             </div>
 
         </div>
