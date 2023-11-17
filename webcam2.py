@@ -5,7 +5,8 @@ import math
 import os
 import sys
 
-def face_confidence(face_distance, face_match_threshold=0.6):
+
+def face_confidence(face_distance, face_match_threshold=0.4):
     range_val = (1.0 - face_match_threshold)
     linear_val = (1.0 - face_distance) / (range_val * 2.0)
 
@@ -14,6 +15,7 @@ def face_confidence(face_distance, face_match_threshold=0.6):
     else:
         value = (linear_val + ((1.0 - linear_val) * math.pow((linear_val - 0.5) * 2, 0.2))) * 100
         return str(round(value, 2)) + '%'
+
 
 class FaceRecognition:
     face_locations = []
@@ -57,7 +59,7 @@ class FaceRecognition:
             face_distances = face_recognition.face_distance(self.known_face_encodings, face_encoding)
             best_match_index = np.argmin(face_distances)
 
-            if matches[best_match_index]:
+            if matches[best_match_index] and face_distances[best_match_index] <= 0.3:
                 name = self.known_face_names[best_match_index]
                 confidence = face_confidence(face_distances[best_match_index])
 

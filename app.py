@@ -13,6 +13,7 @@ from webcam2 import FaceRecognition
 from membercam import FaceRecognition_member
 import tkinter as tk
 from datetime import datetime
+import uuid
 
 
 
@@ -303,14 +304,21 @@ def admin_add_event():
 
 
 @app.route("/checkout")
+@app.route("/checkout")
 def checkout():
-    user_json = session.get('user')  # Get user JSON from session
-    user_data = json.loads(user_json)  # Parse JSON to dictionary
-    name = user_data['name']
-    email = user_data['email']
-    phone = user_data['phone']
+    user_json = session.get('user')
+    user_data = json.loads(user_json)
 
-    return render_template('checkout.html', name = name, email = email, phone =phone)
+    # 從資料庫中創建一個新的訂單，獲取訂單編號
+    order_id = create_order(user_data['name'], user_data['email'], user_data['phone'])
+
+    # 將訂單編號傳遞到模板中
+    return render_template('checkout.html', name=user_data['name'], email=user_data['email'], phone=user_data['phone'], order_id=order_id)
+
+def create_order(name, email, phone):
+    # 在這裡執行創建訂單的邏輯，返回使用UUID生成的訂單編號
+    order_id = str(uuid.uuid4())
+    return order_id
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', debug=True, port=5000)
