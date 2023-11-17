@@ -1,4 +1,4 @@
-$("form[name=signup_form").submit(function(e) {
+$("form[name=signup_form]").submit(function(e) {
 
     var $form = $(this);
     var $error = $form.find(".error");
@@ -24,7 +24,7 @@ $("form[name=signup_form").submit(function(e) {
 
 });
 
-$("form[name=login_form").submit(function(e) {
+$("form[name=login_form]").submit(function(e) {
 
     var $form = $(this);
     var $error = $form.find(".error");
@@ -41,6 +41,7 @@ $("form[name=login_form").submit(function(e) {
         },
         error: function(resp) {
             console.log(resp);
+            /*window.alert(resp.responseJSON.error);*/
             $error.text(resp.responseJSON.error).removeClass("error--hidden")
         }
 
@@ -61,13 +62,12 @@ $("form[name=update_user_form]").submit(function(e) {
         data: data,
         dataType: "json",
         success: function(resp) {
-            window.location.href = "/dashboard/";
+            window.location.href = "/memberprofile";
             window.alert("修改成功");
         },
         error: function(resp) {
             console.log(resp);
             $error.text(resp.responseJSON.error).removeClass("error--hidden")
-            window.alert("修改失敗");
         }
 
     });
@@ -75,20 +75,83 @@ $("form[name=update_user_form]").submit(function(e) {
 
 });
 
-$(document).ready(function() {
+$('#password, #password_confirm').on('keyup', function(){
 
-    $('#password, #password_confirm').keyup(validate);
-      
-    function validate() {
-        if ( $('#password_confirm').val() == $('#password').val()) {
-            $('#password_confirm').css('border-color', '');
-            $('#password').css('border-color', '');
-            
-        } else { 
-            $('#password_confirm').css('border-color', 'red');
-            $('#password').css('border-color', 'red');
-          }
-    };
-      
+    $('.confirm-message').removeClass('success-message').removeClass('error-message');
+    
+    let password=$('#password').val();
+    let confirm_password=$('#password_confirm').val();
+    
+    if(confirm_password===""){
+        $('.confirm-message').text("Confirm Password Field cannot be empty").addClass('error-message');
+    }
+    else if(confirm_password===password)
+    {
+        $('.confirm-message').text('Password Match!').addClass('success-message');
+    }
+    else{
+        $('.confirm-message').text("Password Doesn't Match!").addClass('error-message');
+    }
+    
+    });
+
+$("form[name=add_event_form]").submit(function (e) {
+
+    var $form = $(this);
+    var $error = $form.find(".error");
+    var formData = new FormData($form[0]);
+
+    $.ajax({
+        url: "/add_event",
+        type: "POST",
+        data: formData,
+        processData: false, // 必须设置为 false
+        contentType: false, // 必须设置为 false
+        dataType: "json",
+        success: function (resp) {
+            window.location.href = "/eventlist";
+            window.alert("Event added");
+        },
+        error: function (resp) {
+            console.log("script: failed" + resp.responseJSON.error);
+            $error.text(resp.responseJSON.error).removeClass("error--hidden");
+        },
+    });
+    e.preventDefault();
 });
+
+$("form[name=edit_event_form]").submit(function(e) {
+
+    var $form = $(this);
+    var $error = $form.find(".error");
+    var data = $form.serialize();
+
+    var event_id = window.location.pathname.split('/').pop();
+    // 构建完整的 URL，将 event_id 插入到 URL 中
+    var url = "/modify_event/" + event_id;
+
+    $.ajax({
+        url: url,  // 使用event_id构建编辑事件的URL
+        type: "POST",
+        data: data,
+        dataType: "json",
+        success: function(resp) {
+            window.location.href = "/eventlist";
+            window.alert("修改成功");
+
+        },
+        error: function(resp) {
+            console.log(resp);
+            $error.text(resp.responseJSON.error).removeClass("error--hidden");
+            window.alert("修改失敗");
+        }
+    });
+
+    e.preventDefault();
+});
+
+
+
+
+
 
