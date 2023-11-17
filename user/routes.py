@@ -33,9 +33,10 @@ def update_user_route():
     user_obj = User()
     return user_obj.update_user()
 
-@app.route("/admin", methods = ['GET'])
+@app.route("/memberlist", methods = ['GET'])
 def get_all_member():
     return User().get_all_member()
+
 
 @app.route("/delete_member/<string:email>", methods = ['GET'])
 def delete_member(email):
@@ -53,10 +54,38 @@ def test_get_all_member():
 ### end testing
 
 
+@app.route("/eventlist", methods = ['GET'])
+def get_all_event():
+    return Event().get_all_event()
+
+@app.route('/event/<event_id>/image')
+def get_event_image(event_id):
+    return Event().get_event_image(event_id)
+
 @app.route("/add_event", methods = ['POST'])
 def add_event():
     return Event().add_event()
 
+
+@app.route("/delete_event/<string:title>", methods = ['GET'])
+def delete_event(title):
+    print("routes: delete event")
+    return Event().delete_event(title)
+
+
+@app.route("/get_event/<event_id>", methods = ['GET'])
+def get_event(event_id):
+    return Event().get_event(event_id)
+
+
+@app.route('/ad_event/<event_id>')
+def ad_event_details(event_id):
+    return Event().ad_event_details(event_id)
+
+
+@app.route("/modify_event/<event_id>", methods = ['GET', 'POST'])
+def modify_event(event_id):
+    return Event().modify_event(event_id)
 
 @app.route('/membercam')
 def membercam():
@@ -130,7 +159,7 @@ def recognition_result():
     global result
     if result >= 0.75:
         print(result)
-        show_success_popup(session_name)
+        #show_success_popup(session_name)
         return render_template('recognition_correct.html')
     elif result <0.75:
         print(result)
@@ -173,3 +202,4 @@ def event_details(event_id):
 def all_event():
     return User.all_event()
     #return render_template('all_event.html')
+
