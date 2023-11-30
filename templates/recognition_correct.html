@@ -11,6 +11,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // 顯示成功的提示消息
     Swal.fire({
         title: '驗證為本人',
         text: '購票成功',
@@ -19,8 +20,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }).then((result) => {
         if (result.isConfirmed) {
             // 按下了“確定”按钮
-            window.location.href = " / ";
+            window.location.href = "/";
         }
     });
 });
+
+
 </script>

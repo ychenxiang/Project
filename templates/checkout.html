@@ -3,9 +3,7 @@
 {% block title %} 結帳 {% endblock %}
 
 {% block content %}
-    <style>
-
-
+<style>
     .ticketTable {
         border-collapse: collapse;
         width: 100%;
@@ -16,7 +14,8 @@
         margin-bottom: 1px; /* 調整下邊距 */
     }
 
-    .ticketTable th, .ticketTable td {
+    .ticketTable th,
+    .ticketTable td {
         padding: 10px;
         text-align: left;
     }
@@ -57,126 +56,119 @@
     .btn-delete:hover {
         background-color: #bd2130;
     }
-    </style>
+</style>
 
+<div class="container">
+    <div class="col-md-12 col-sm-12 col-12 mt-3">
+        <div id="countdown" style="font-size: 20px; color: red; text-align: center"></div>
 
-
-    <div class="container">
-        <div class="col-md-12 col-sm-12 col-12 mt-3">
-            <div id="countdown" style="font-size: 20px; color: red; text-align: center"></div>
-
-
-            <p>參與者資料</p>
-                <strong>姓名: </strong> {{ name }} <br>
-                <strong>EMAIL: </strong> {{ email }} <br>
-                <strong>電話: </strong> {{ phone }} <br>
-            </div>
-
-            <br>
-            <div class="orderID">訂單編號 {{ order_id }}</div>
-            <div class="tableBox">
-                <table class="ticketTable">
-                    <thead class="ticketTable-thead">
-                        <tr>
-                            <th>節目</th>
-                            <th>區域</th>
-                            <th>座位</th>
-                            <th>票價(NTD)</th>
-                            <th class="twAct">修改</th>
-                        </tr>
-                    </thead>
-                    <tbody class="ticketTable-tbody">
-                        <tr>
-                            <td>COLDPLAY</td>
-                            <td>A區</td>
-                            <td>1排1號</td>
-                            <td>全票 / 5,800</td>
-                            <td class="initial">
-                                <a class="cancelTicket" href="#" >
-                                    <div class="btn-delete">刪除</div>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr style="background-color: #d3d3d3; text-align: right">
-                            <td colspan="4" style="text-align: left">訂購張數</td>
-                            <td style="text-align: right">1 張</td>
-                        </tr>
-                        <tr style="background-color: #d3d3d3; text-align: right">
-                            <td colspan="4" style="text-align: left">總計(NTD)</td>
-                            <td style="text-align: right">5,800</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-            <div class="text-center mt-3 mb-0">
-                <button onclick="proceedToCheckout()">下一步</button>
-            </div>
+        <p>參與者資料</p>
+        <strong>姓名: </strong> {{ name }} <br>
+        <strong>EMAIL: </strong> {{ email }} <br>
+        <strong>電話: </strong> {{ phone }} <br>
     </div>
 
+    <br>
+    <div class="orderID">訂單編號 {{ order_data.order_id }}</div>
+    <div class="tableBox">
+        <table class="ticketTable">
+            <thead class="ticketTable-thead">
+                <tr>
+                    <th>節目</th>
+                    <th>區域</th>
+                    <th>座位</th>
+                    <th>票價(NTD)</th>
+                    <th class="twAct">修改</th>
+                </tr>
+            </thead>
+            <tbody class="ticketTable-tbody">
+                <tr>
+                    <td>{{ order_data.event.title }}</td>
+                    <td>{{ order_data.area }}</td>
+                    <td>{{ order_data.seat }}</td>
+                    <td>{{ order_data.ticket_price }}</td>
+                    <td class="initial">
+                        <a class="cancelTicket" href="#">
+                            <div class="btn-delete" onclick="cancelOrder()">刪除</div>
+                        </a>
+                    </td>
+                </tr>
+                <tr style="background-color: #d3d3d3; text-align: right">
+                    <td colspan="4" style="text-align: left">訂購張數</td>
+                    <td style="text-align: right">{{ order_data.num_tickets }} 張</td>
+                </tr>
+                <tr style="background-color: #d3d3d3; text-align: right">
+                    <td colspan="4" style="text-align: left">總計(NTD)</td>
+                    <td style="text-align: right">{{ order_data.total_amount }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
-    <script>
-    var countdownMinutes;
-    var countdownSeconds;
-    var countdownDisplay = document.getElementById('countdown');
+<div class="text-center mt-3 mb-0">
+    <button onclick="proceedToCheckout()">下一步，進行身分驗證</button>
+</div>
 
-    function updateCountdown() {
-        countdownDisplay.textContent = '剩餘時間: ' + countdownMinutes + '分' + countdownSeconds + '秒';
+<script>
+    // 函數來更新倒數計時器
+    function updateCountdown(expirationTime) {
+        var countdownElement = document.getElementById('countdown');
+        var remainingTime = Math.floor((new Date(expirationTime) - new Date()) / 1000);
 
-        // 如果倒數計時結束，取消訂單
-        if (countdownMinutes === 0 && countdownSeconds === 0) {
-            cancelOrder();
+        if (remainingTime > 0) {
+            var minutes = Math.floor(remainingTime / 60);
+            var seconds = remainingTime % 60;
+
+            countdownElement.innerHTML = '剩餘時間: ' + minutes + '分 ' + seconds + '秒';
         } else {
-            // 更新倒數計時
-            if (countdownSeconds === 0) {
-                countdownMinutes--;
-                countdownSeconds = 59;
-            } else {
-                countdownSeconds--;
-            }
-            setTimeout(updateCountdown, 1000);
+            countdownElement.innerHTML = '已過期';
         }
     }
 
-    function startCountdown() {
-        // 檢查localStorage中是否有保存的時間
-        var storedMinutes = localStorage.getItem('countdownMinutes');
-        var storedSeconds = localStorage.getItem('countdownSeconds');
+     // 調用函數，更新倒數計時器，僅當 order_expired_at 不為空時
+    {% if order_expired_at %}
+        updateCountdown("{{ order_expired_at }}");
 
-        // 如果有保存的時間，使用它們
-        if (storedMinutes !== null && storedSeconds !== null) {
-            countdownMinutes = parseInt(storedMinutes, 10);
-            countdownSeconds = parseInt(storedSeconds, 10);
-        } else {
-            // 否則，設定初始時間，這裡設定為10分鐘
-            countdownMinutes = 0;
-            countdownSeconds = 30;
-        }
-
-        // 啟動倒數計時
-        updateCountdown();
-    }
+        // 每秒更新一次倒數計時器
+        setInterval(function() {
+            updateCountdown("{{ order_expired_at }}");
+        }, 1000);
+    {% endif %}
 
     function cancelOrder() {
-        alert('訂單已取消');
-        // 可以添加取消訂單的相關邏輯
+        var orderId = "{{ order_data.order_id }}";  // 使用模板語言插入訂單編號
+
+        // 發送 AJAX 請求到後端，取消訂單
+        $.ajax({
+            type: "POST",
+            url: "/cancel_order",  // 根據你的 Flask 路由配置，請確保這個路由存在
+            data: { orderId: orderId },
+            success: function(response) {
+                // 在後端處理完畢後的回應
+                alert(response.message);
+                window.location.href = "/event/{{ order_data.event._id }}/ticket"
+            },
+            error: function(error) {
+                console.error("Error cancelling order:", error);
+            }
+        });
     }
+
+
+
 
     function proceedToCheckout() {
-        alert('前往結帳');
-        // 可以添加前往結帳的相關邏輯
+        alert('前往驗證身分');
+        // 在這裡可以添加前往結帳的相關邏輯
+
+        // 跳轉到 /membercam 路由
+        window.location.href = "/membercam";
     }
 
-    // 在頁面載入時啟動計時器
-    window.onload = startCountdown;
-
-    // 在頁面離開前將計時器狀態保存到localStorage中
-    window.onbeforeunload = function () {
-        localStorage.setItem('countdownMinutes', countdownMinutes);
-        localStorage.setItem('countdownSeconds', countdownSeconds);
-    };
-
+    {% if show_alert %}
+        alert("您的上筆訂單尚未完成，請在時間內完成購票。");
+    {% endif %}
 
 </script>
 
