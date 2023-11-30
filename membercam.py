@@ -5,6 +5,9 @@ import math
 import os
 from flask import session
 import sys
+from gridfs import GridFS
+import pymongo
+import io
 
 def face_confidence(face_distance, face_match_threshold=0.4):
     range_val = (1.0 - face_match_threshold)
@@ -25,15 +28,34 @@ class FaceRecognition_member:
     process_current_frame = True
 
     def __init__(self):
-        self.encode_faces()
+        self.encode_faces_from_mongodb()
+    def encode_faces_from_mongodb(self):
+        myclient = pymongo.MongoClient("mongodb+srv://team17:TqZI3KaT56q6xwYZ@team17.ufycbtt.mongodb.net/")
+        mydb = myclient.face
+        fs = GridFS(mydb, collection="faces")
 
-    def encode_faces(self):
-        for image in os.listdir('faces'):
-            face_image = face_recognition.load_image_file(f'faces/{image}')
-            face_encoding = face_recognition.face_encodings(face_image)[0]
+        # 查询数据库中的图像集合（假设图像存储在名为 'faces' 的集合中）
+        images = fs.find()
 
-            self.known_face_encodings.append(face_encoding)
-            self.known_face_names.append(os.path.splitext(image)[0])  # Remove the file extension
+        for image_data in images:
+            # 从 GridFS 获取图像数据
+            grid_out = fs.get(image_data._id)
+            image_binary = grid_out.read()
+
+            # 将二进制数据转换为图像
+            face_image = face_recognition.load_image_file(io.BytesIO(image_binary))
+
+            # 进行人脸编码
+            face_encoding = face_recognition.face_encodings(face_image)
+
+            if len(face_encoding) > 0:
+                face_encoding = face_encoding[0]
+
+                # 存储人脸编码和名称
+                self.known_face_encodings.append(face_encoding)
+                self.known_face_names.append(image_data.filename)  # 使用图像的文件名作为名称
+
+        myclient.close()  # 关闭 MongoDB 连接
 
         print(self.known_face_names)
 

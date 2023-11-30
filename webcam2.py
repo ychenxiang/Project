@@ -3,8 +3,11 @@ import cv2
 import numpy as np
 import math
 import os
+from flask import session
 import sys
-
+from gridfs import GridFS
+import pymongo
+import io
 
 def face_confidence(face_distance, face_match_threshold=0.4):
     range_val = (1.0 - face_match_threshold)
@@ -16,7 +19,6 @@ def face_confidence(face_distance, face_match_threshold=0.4):
         value = (linear_val + ((1.0 - linear_val) * math.pow((linear_val - 0.5) * 2, 0.2))) * 100
         return str(round(value, 2)) + '%'
 
-
 class FaceRecognition:
     face_locations = []
     face_encodings = []
@@ -26,22 +28,37 @@ class FaceRecognition:
     process_current_frame = True
 
     def __init__(self):
-        self.encode_faces()
+        self.encode_faces_from_mongodb()
 
-    def encode_faces(self):
-        for image in os.listdir('faces'):
-            face_image = face_recognition.load_image_file(f'faces/{image}')
-            face_encodings = face_recognition.face_encodings(face_image)
+    def encode_faces_from_mongodb(self):
+        myclient = pymongo.MongoClient("mongodb+srv://team17:TqZI3KaT56q6xwYZ@team17.ufycbtt.mongodb.net/")
+        mydb = myclient.face
+        fs = GridFS(mydb, collection="faces")
 
-            if len(face_encodings) > 0:
-                face_encoding = face_encodings[0]
+        # 查询数据库中的图像集合（假设图像存储在名为 'faces' 的集合中）
+        images = fs.find()
+
+        for image_data in images:
+            # 从 GridFS 获取图像数据
+            grid_out = fs.get(image_data._id)
+            image_binary = grid_out.read()
+
+            # 将二进制数据转换为图像
+            face_image = face_recognition.load_image_file(io.BytesIO(image_binary))
+
+            # 进行人脸编码
+            face_encoding = face_recognition.face_encodings(face_image)
+
+            if len(face_encoding) > 0:
+                face_encoding = face_encoding[0]
+
+                # 存储人脸编码和名称
                 self.known_face_encodings.append(face_encoding)
-                self.known_face_names.append(os.path.splitext(image)[0])
-            else:
-                print(f"No face detected in {image}")  # 可以添加一条错误消息或处理空列表的逻辑
+                self.known_face_names.append(image_data.filename)  # 使用图像的文件名作为名称
+
+        myclient.close()  # 关闭 MongoDB 连接
 
         print(self.known_face_names)
-
     def run_recognition(self, frame):
         frame = cv2.flip(frame, 1)
         small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
@@ -59,9 +76,11 @@ class FaceRecognition:
             face_distances = face_recognition.face_distance(self.known_face_encodings, face_encoding)
             best_match_index = np.argmin(face_distances)
 
-            if matches[best_match_index] and face_distances[best_match_index] <= 0.3:
+            if matches[best_match_index] and face_distances[best_match_index] <= 0.35:  # 設定閾值為0.75
                 name = self.known_face_names[best_match_index]
                 confidence = face_confidence(face_distances[best_match_index])
+
+
 
             self.face_names.append(f'{name}({confidence})')
 
@@ -74,5 +93,7 @@ class FaceRecognition:
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), -1)
             cv2.putText(frame, name, (left + 6, bottom - 6), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1)
+
+
 
         return frame

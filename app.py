@@ -14,6 +14,7 @@ from membercam import FaceRecognition_member
 import tkinter as tk
 from datetime import datetime
 import uuid
+from gridfs import GridFS
 
 
 
@@ -21,8 +22,10 @@ app = Flask(__name__)
 app.secret_key = b'kushfuii7w4y7ry47ihwiheihf8774sdf4'
 
 myclient = pymongo.MongoClient("mongodb+srv://team17:TqZI3KaT56q6xwYZ@team17.ufycbtt.mongodb.net/")
-mydb = myclient.test
 
+
+mydb = myclient.face
+fs = GridFS(mydb, collection="faces")
 
 video_stream = VideoCamera()
 
@@ -99,7 +102,6 @@ def user_login():
 
 
 @app.route('/dashboard/')
-
 def dashboard():
     return render_template('dashboard.html')
 
@@ -152,26 +154,12 @@ def save_photo():
         user_data = json.loads(user_json)  # Parse JSON to dictionary
         user_name = user_data['name']
 
-        #try:
-            #photo_id = fs.put(captured_photo, filename=f"{user_name}.jpg")
-            #print(f"Photo saved with ID: {photo_id}")
-        #except Exception as e:
-            #print(f"Error saving photo: {str(e)}")
-
-        # 指定保存到 "faces" 子文件夹的路径
-        output_folder = 'faces'
-
-        # 确保目标文件夹存在，如果不存在则创建它
-        os.makedirs(output_folder, exist_ok=True)
-
-        # 创建完整的文件路径，将照片保存到 "faces" 子文件夹中
-        photo_filename = os.path.join(output_folder, f'{user_name}.jpg')
-
-        # 写入照片数据到文件
-        with open(photo_filename, 'wb') as photo_file:
-            photo_file.write(captured_photo)
-
-    return redirect(url_for('dashboard'))
+        try:
+            photo_id = fs.put(captured_photo, filename=f"{user_name}")
+            print(f"Photo saved with ID: {photo_id}")
+        except Exception as e:
+            print(f"Error saving photo: {str(e)}")
+        return redirect(url_for('memberprofile'))
 
 @app.route('/retake_photo', methods=['POST'])
 def retake_photo():
@@ -199,13 +187,22 @@ def generate_frames():
 
         frame = fr.run_recognition(frame)
 
-        _, buffer = cv2.imencode('.jpg', frame)
-        frame = buffer.tobytes()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        if frame is not None:  # 檢查 frame 是否為有效的圖像
+            _, buffer = cv2.imencode('.jpg', frame)
+            if buffer is not None:  # 檢查 buffer 是否為有效的編碼
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+            else:
+                print("Error encoding frame")
+        else:
+            print("No frame captured")
+
+            # 檢查是否需要退出捕獲視頻
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
     video_capture.release()
-
+    cv2.destroyAllWindows()
 
 # 人臉辨識(驗證使用者)
 @app.route('/cam3')
@@ -229,36 +226,11 @@ def set_name():
 
     return 'Name set successfully'
 
-'''
-@app.route('/membercam')
-def membercam():
-    user_json = session.get('user')  # Get user JSON from session
-    user_data = json.loads(user_json)  # Parse JSON to dictionary
-    name = user_data['name']
-    print("這裡是setname")
-
-    # 同時也設定全域變數 global_name
-    global global_name
-    global_name = name
-
-    return render_template('membercam.html')
-'''
 
 @app.route('/video_feed2')
 def video_feed2():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-'''
-@app.route('/recognition_correct')
-def recognition_correct():
-    generated_url = url_for('home')
-    return render_template('recognition_correct.html', home_url=generated_url)
-
-@app.route('/recognition_fail')
-def recognition_fail():
-    generated_url = url_for('home')
-    return render_template('recognition_fail.html',  home_url=generated_url)
-'''
 
 @app.route('/memberprofile')
 @login_required
@@ -287,13 +259,6 @@ def admin():
     return render_template('admin.html')
 
 
-@app.route('/test')
-def test_admin():
-    print("reaching for test.html")
-    return render_template('test.html', members=members)
-    return render_template('test.html')
-
-
 @app.route('/test_error')
 def test_admin_error():
     return render_template('test_error.html')
@@ -303,22 +268,6 @@ def admin_add_event():
     return render_template('add_event.html')
 
 
-@app.route("/checkout")
-@app.route("/checkout")
-def checkout():
-    user_json = session.get('user')
-    user_data = json.loads(user_json)
-
-    # 從資料庫中創建一個新的訂單，獲取訂單編號
-    order_id = create_order(user_data['name'], user_data['email'], user_data['phone'])
-
-    # 將訂單編號傳遞到模板中
-    return render_template('checkout.html', name=user_data['name'], email=user_data['email'], phone=user_data['phone'], order_id=order_id)
-
-def create_order(name, email, phone):
-    # 在這裡執行創建訂單的邏輯，返回使用UUID生成的訂單編號
-    order_id = str(uuid.uuid4())
-    return order_id
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', debug=True, port=5000)
