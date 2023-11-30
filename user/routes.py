@@ -1,4 +1,4 @@
-from flask import Flask, session, Response, redirect,render_template, url_for
+from flask import Flask, session, Response, redirect, render_template, url_for, request, jsonify
 from app import app
 from user.models import User, Event
 import cv2
@@ -6,7 +6,12 @@ from membercam import FaceRecognition_member
 from tkinter import messagebox
 import json
 import webbrowser
+import pymongo
+from datetime import datetime
 
+
+myclient = pymongo.MongoClient("mongodb+srv://team17:TqZI3KaT56q6xwYZ@team17.ufycbtt.mongodb.net/")
+mydb = myclient.test
 
 global_name = None
 result = 0
@@ -160,25 +165,14 @@ def recognition_result():
     if result >= 0.75:
         print(result)
         #show_success_popup(session_name)
-        return render_template('recognition_correct.html')
+        return Event.recognition_correct()
+
     elif result <0.75:
         print(result)
         #show_fail_popup(session_name)
         return render_template('recognition_fail.html')
 
-@app.route('/recognition_correct')
-def recognition_correct():
-    print('成功進結果網頁')
-    print(result)
-    return render_template('recognition_correct.html')
-
-@app.route('/recognition_fail')
-def recognition_fail():
-    print('成功進判斷式')
-    print(result)
-    return render_template('recognition_fail.html')
-
-
+'''
 def show_success_popup(name):
     message = f"{name} 成功驗證為本人"
     messagebox.showinfo('Recognition Success', message)  # 訊息內容
@@ -189,6 +183,7 @@ def show_fail_popup(name):
     messagebox.showwarning(title='Recognition Fail',  # 視窗標題
                         message=message)  # 訊息內容
     webbrowser.open('http://127.0.0.1:5000/recognition_fail')
+'''
 
 @app.route('/search', methods=['POST'])
 def search():
@@ -201,5 +196,27 @@ def event_details(event_id):
 @app.route("/all_event", methods = ['GET'])
 def all_event():
     return User.all_event()
-    #return render_template('all_event.html')
 
+@app.route('/event/<event_id>/ticket')
+def event_ticket(event_id):
+    return Event().event_ticket(event_id)
+
+@app.route('/create_seat')
+def create_seat():
+    return Event().create_seat()
+
+@app.route('/check_ticket_availability', methods=['GET'])
+def check_ticket_availability():
+    return Event().check_ticket_availability()
+
+@app.route('/<event_id>/checkout', methods=['GET','POST'])
+def checkout(event_id):
+    return Event().checkout(event_id)
+
+@app.route('/cancel_order', methods=['POST'])
+def cancel_order():
+    return Event().cancel_order()
+
+@app.route('/order')
+def order():
+    return Event().order()
